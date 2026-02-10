@@ -1,10 +1,5 @@
 ---
 
-#cluster Health check
-- name: Check the health of the cluster
-  include_role:
-   name: check-cluster-health
-
 - name: Install Package
   package:
     name:
@@ -64,7 +59,6 @@
     podman rm $container_id
   register: podman_cp
   failed_when: podman_cp.rc != 0
-  ignore_errors: yes
 
 - name: Extract the mirror registry
   become: yes
@@ -75,13 +69,14 @@
 
 - name: Install mirror registry
   shell: |
-    "{{ mirror_registry_dir }}/mirror-registry" install \
-      --initPassword= "{{ init_password }}" \
-      --quayHostname= "{{ registry_hostname }}"
+    "{{ mirror_registry_dir }}/mirror-registry" install  
+    --initPassword="{{ init_password }}" 
+    --quayHostname="{{ registry_hostname }}"
   register: install_result
   become: yes
+  no_log: true 
 
 
-- name: Successfull Installation
+- name: Successful Installation
   debug:
     msg: "{{ install_result.stdout_lines[-2:] }}"
